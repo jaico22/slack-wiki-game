@@ -1,7 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
 using SlackAPI.WebSocketMessages;
 using System;
 using System.Collections.Generic;
 using WikiGameBot.Bot;
+using WikiGameBot.Core;
+using WikiGameBot.Data.Loaders;
+using WikiGameBot.Data.Loaders.Interfaces;
 using Xunit;
 
 namespace Tests
@@ -10,27 +14,28 @@ namespace Tests
     {
         public string _messageText { get; set; }
         public NewMessage _newMessage { get; set; }
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly MessageProcessor _messageProcessor;
+
+        public MessageProcessorTests()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IGameReaderWriter, MockGameReaderWriter>()
+                .BuildServiceProvider();
+
+            _messageProcessor = new MessageProcessor(serviceProvider.GetService<IGameReaderWriter>());
+        }
         List<string> _links = new List<string>();
 
-        [Fact]
-        public void NewGameCanBeDetected()
+
+        private void WhenTheMessageIsProcessed()
         {
-            GivenAMessageWithText("Today's Challenge: https://en.wikipedia.org/wiki/Buddy_Guy -> https://en.wikipedia.org/wiki/Ramen");
-            ThenTheMessageProcessorReturnNewGame();
+            _messageProcessor.ProcessMessage(_newMessage);
         }
 
-        [Fact]
-        public void WikipediaLinksCanBeDetected()
+        private void GivenTheDefaultGame()
         {
             GivenTheMessageText("Today's Challenge: https://en.wikipedia.org/wiki/Buddy_Guy -> https://en.wikipedia.org/wiki/Ramen");
-            WhenLinksAreGeneratedOnMessageText();
-            ThenTheLinksLookLike(new List<string>() { "https://en.wikipedia.org/wiki/Buddy_Guy", "https://en.wikipedia.org/wiki/Ramen" });
-        }
-
-        private void ThenTheMessageProcessorReturnNewGame()
-        {
-            Assert.True(_messageProcessor.CheckIfMessageIsANewGame(_newMessage));
+            _messageProcessor.ProcessMessage(_newMessage);
         }
 
         private void GivenAMessageWithText(string messageText)
@@ -43,11 +48,7 @@ namespace Tests
             _messageText = messageText;
         }
 
-        private void WhenLinksAreGeneratedOnMessageText()
-        {
-            _links = _messageProcessor.ExtractWikipediaLinks(_messageText);
 
-        }
         private void ThenTheLinksLookLike(List<string> links)
         {
             Assert.Equal(links, _links);

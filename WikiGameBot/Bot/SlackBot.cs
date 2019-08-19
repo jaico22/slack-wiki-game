@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using SlackAPI;
-
+using WikiGameBot.Core;
+using WikiGameBot.Data.Loaders.Interfaces;
 
 namespace WikiGameBot.Bot
 {
@@ -12,19 +14,23 @@ namespace WikiGameBot.Bot
     {
         public SlackSocketClient _client { get; set; }
 
+        private IGameReaderWriter _gameReaderWriter;
+
         List<WikiMessage> _wikiMessages = new List<WikiMessage>();
 
-        public SlackBot(string Token)
+        public SlackBot(string Token,ServiceProvider services)
         {
             if (string.IsNullOrWhiteSpace(Token))
             {
                 throw new ArgumentNullException();
             }
             _client = new SlackSocketClient(Token);
+            _gameReaderWriter = services.GetService<IGameReaderWriter>();
         }
 
         public void Connect()
         {
+            MessageProcessor processor = new MessageProcessor(_gameReaderWriter);
             Console.WriteLine("RTM Client Connecting...");
             ManualResetEventSlim clientReady = new ManualResetEventSlim(false);
             
@@ -36,29 +42,25 @@ namespace WikiGameBot.Bot
             });
             _client.OnMessageReceived += (message) =>
             {
-                Console.WriteLine($"Msg Id: {message.id} To: {message.reply_to} Type: {message.type} SubType: {message.subtype} " +
-                    $"Text: {message.text} TS: {message.ts} Thread TS: {message.thread_ts}");
-                Console.WriteLine(message.ToString());
-                // Handle each message as you receive them
-                _wikiMessages.Add(new WikiMessage
+                var res = processor.ProcessMessage(message);
+                if (res != null)
                 {
-                    MessageId = message.id,
-                    MessageType = message.type,
-                    ThreadId = message.reply_to,
-                    ThreadTs = message.thread_ts,
-                    UserId = message.username,
-                    MessageText = message.text,
-                });
+                    var chan = _client.Channels.Find(x => x.name.Equals("wikigame"));
+                    var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
+                    _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText, thread_ts: thread_ts);
+                }
             };
             
             clientReady.Wait();
 
-            _client.GetChannelList((clr) => { Console.WriteLine("got channels"); });
+            // Send heartbeat
             var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
             _client.PostMessage(x => Console.WriteLine(x.error),c.id,"Hello!");
 
             while (true) { };
         }
+
+        
 
 
     }
