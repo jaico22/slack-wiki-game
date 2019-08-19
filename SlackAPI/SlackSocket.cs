@@ -43,16 +43,8 @@ namespace SlackAPI
         {
             routing = new Dictionary<string, Dictionary<string, Type>>();
 
-#if NET45 || NETSTANDARD2_0
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GlobalAssemblyCache == false);
-#elif NETSTANDARD1_6
-             var assemblies = DependencyContext.Default.GetDefaultAssemblyNames().Select(Assembly.Load);
-#elif NETSTANDARD1_3
-            var assemblies = new[] { typeof(SlackSocket).GetType().GetTypeInfo().Assembly };
-#warning Routing messages in custom assemblies are not supported with .Net Standard 1.3
-#else
-#error Platform not supported
-#endif
+
             foreach (Assembly assembly in assemblies)
             {
                 Type[] assemblyTypes;
