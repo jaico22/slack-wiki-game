@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using WikiGameBot.Bot;
 
 namespace WikiGameBot
 {
@@ -6,7 +9,9 @@ namespace WikiGameBot
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string token = Environment.GetEnvironmentVariable("WIKI_BOT_USER_OATH_TOKEN");
+            SlackBot bot = new SlackBot(token);
+            bot.Connect();
         }
     }
 }

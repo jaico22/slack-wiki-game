@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiGameBot", "WikiGameBot\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlackAPI", "SlackAPI\SlackAPI.csproj", "{DCB94185-B2DE-4731-A9AE-C9220B99861A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BF80E3CB-B576-4B95-9A40-9FFAFCB4C9CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DCB94185-B2DE-4731-A9AE-C9220B99861A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCB94185-B2DE-4731-A9AE-C9220B99861A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCB94185-B2DE-4731-A9AE-C9220B99861A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF80E3CB-B576-4B95-9A40-9FFAFCB4C9CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF80E3CB-B576-4B95-9A40-9FFAFCB4C9CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF80E3CB-B576-4B95-9A40-9FFAFCB4C9CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF80E3CB-B576-4B95-9A40-9FFAFCB4C9CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
