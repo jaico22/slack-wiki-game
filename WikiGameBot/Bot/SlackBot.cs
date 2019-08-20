@@ -48,23 +48,33 @@ namespace WikiGameBot.Bot
             });
             _client.OnMessageReceived += (message) =>
             {
-                var res = processor.ProcessMessage(message);
-                if (res != null)
+                // Ignore Bots
+                if (message.user != null)
                 {
-                    var chan = _client.Channels.Find(x => x.name.Equals("wikigame"));
-                    var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
-                    _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText, thread_ts: thread_ts);
+                    // Overwrite username with poster's real name
+                    User poster = new User();
+                    _client.UserLookup.TryGetValue(message.user, out poster);
+                    Console.WriteLine(poster.real_name);
+                    message.username = poster.real_name;
+
+                    var res = processor.ProcessMessage(message);
+                    if (res != null)
+                    {
+                        var chan = _client.Channels.Find(x => x.name.Equals("wikigame"));
+                        var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
+                        _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText, thread_ts: thread_ts);
+                    }
                 }
+
             };
             
             clientReady.Wait();
 
             // Send heartbeat
             var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
-            /*_client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
-                "Afterwards, reply to that post in the formal \"Start -> Click 1 -> Click 2 -> ... -> End\"\n" +
-                "Type \"wiki-bot: stats\" for records on the current game\n\n" +
-                "Note: This is the proof of concept version; Starting a new game will reset the client");*/
+            _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
+                "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page\"\n" +
+                "Note: This is the proof of concept version; Starting a new game will reset the client");
 
 
             while (true) { };

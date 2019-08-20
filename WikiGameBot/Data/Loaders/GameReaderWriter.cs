@@ -164,7 +164,7 @@ namespace WikiGameBot.Data.Loaders
                 }
                 IncrementPlayerWinCount(winningEntry.UserId);
                 // Return Winning String
-                printMessage.MessageText = $"Game ended! {winningEntry.UserId} wins with with their {winningEntry.LinkCount} link long entry of \"{winningEntry.RawText}\"";
+                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with with their {winningEntry.LinkCount} link long entry of \"{winningEntry.RawText}\"";
             }
             else
             {

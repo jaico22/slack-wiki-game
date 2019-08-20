@@ -19,6 +19,5 @@ namespace WikiGameBot.Data.Entities
         /// Indication if game is active
         /// </summary>
         public bool IsActive { get; set; }
-
     }
 }
