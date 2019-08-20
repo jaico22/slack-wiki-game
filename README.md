@@ -21,7 +21,7 @@ e.g:
 ## TODOs
 <del>1. Database Integration</del>
 
-2. Aggregate Stastics
+2. Implement Game Stastics
 
 3. Path Confirmation
 
