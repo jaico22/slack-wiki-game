@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SlackAPI;
 using WikiGameBot.Core;
+using WikiGameBot.Data.Loaders;
 using WikiGameBot.Data.Loaders.Interfaces;
 
 namespace WikiGameBot.Bot
@@ -14,6 +15,7 @@ namespace WikiGameBot.Bot
     {
         public SlackSocketClient _client { get; set; }
 
+        private IDBServerInfoLoader _dBServerInfoLoader;
         private IGameReaderWriter _gameReaderWriter;
 
         List<WikiMessage> _wikiMessages = new List<WikiMessage>();
@@ -26,10 +28,13 @@ namespace WikiGameBot.Bot
             }
             _client = new SlackSocketClient(Token);
             _gameReaderWriter = services.GetService<IGameReaderWriter>();
+            _dBServerInfoLoader = services.GetService<IDBServerInfoLoader>();
         }
 
         public void Connect()
         {
+            Console.WriteLine(_dBServerInfoLoader.GetConnectionString());
+
             MessageProcessor processor = new MessageProcessor(_gameReaderWriter);
             Console.WriteLine("RTM Client Connecting...");
             ManualResetEventSlim clientReady = new ManualResetEventSlim(false);

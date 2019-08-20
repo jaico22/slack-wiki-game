@@ -14,6 +14,7 @@ namespace WikiGameBot
             // Depenecy Injection
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IGameReaderWriter, MockGameReaderWriter>()
+                .AddSingleton<IDBServerInfoLoader, AWSRDSInfoLoader>()
                 .BuildServiceProvider();
 
             // Game
