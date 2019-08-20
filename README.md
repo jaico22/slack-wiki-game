@@ -20,7 +20,11 @@ e.g:
   
 ## TODOs
 <del>1. Database Integration</del>
+
 2. Aggregate Stastics
+
 3. Path Confirmation
+
 4. Reactions to indicate curernt winner
+
 5. Automated Game Completion
