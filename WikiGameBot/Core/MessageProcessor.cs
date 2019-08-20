@@ -33,23 +33,34 @@ namespace WikiGameBot.Core
                 var gameId = _gameReaderWriter.FindGameId(message);
                 if (gameId != -1)
                 {
-                    if (message.text.ToLower().Trim() == "wiki-bot: stats")
+                    switch (message.text.ToLower().Trim())
                     {
-                        var stats = _gameReaderWriter.GetGameStatistics(gameId);
-                        return PrintStats(stats, gameId);
+                        case "wiki-bot stats":
+                        case "wiki-bot: stats":
+                            var stats = _gameReaderWriter.GetGameStatistics(gameId);
+                            return PrintStats(stats, gameId);
+                        case "wiki-bot end":
+                        case "wiki-bot end game":
+                        case "wiki-bot endgame":
+                        case "wiki-bot: end":
+                        case "wiki-bot: end game":
+                        case "wiki-bot: endgame":
+                            return _gameReaderWriter.EndGame(gameId);
+                        default:
+                            break;
                     }
-                    else
+
+                    int linkCount = GenerateLinkCount(message);
+                    // TODO: Username is showing as null occasionally
+                    _gameReaderWriter.AddGameEntry(new GameEntry
                     {
-                        int linkCount = GenerateLinkCount(message);
-                        // TODO: Username is showing as null occasionally
-                        _gameReaderWriter.AddGameEntry(new GameEntry
-                        {
-                            LinkCount = linkCount,
-                            User = message.user,
-                            UserName = message.username,
-                            GameId = gameId
-                        });
-                    }
+                        LinkCount = linkCount,
+                        User = message.user,
+                        RawText = message.text,
+                        UserName = message.username,
+                        GameId = gameId
+                    });
+                    
                 }
 
             }

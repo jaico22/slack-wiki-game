@@ -5,7 +5,7 @@ _Note: Very much a work-in-progress; A proof-of-concept currently lives on maste
 
 ## Notes for building
 - Set the enviorment variable "WIKI_BOT_USER_OATH_TOKEN" to the bot user OATH token before building
-
+- Modify SecretsManager 
 ## Play Instructions
 1. Start a challenge by posting two links into the slack channel.
 
