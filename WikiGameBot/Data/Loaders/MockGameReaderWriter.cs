@@ -58,5 +58,10 @@ namespace WikiGameBot.Data.Loaders
 
             return gameStatistics;
         }
+
+        public void AddUserIfFirstTimePlaying(string UserId, string UserName)
+        {
+            // Not needed in mockup
+        }
     }
 }

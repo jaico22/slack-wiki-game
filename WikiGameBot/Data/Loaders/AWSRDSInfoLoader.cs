@@ -17,7 +17,7 @@ namespace WikiGameBot.Data.Loaders
         {
             var credentialsJSON = GetAWSSecret("wikibot-database-creds");
             SQLServerCredentials credentials = JsonConvert.DeserializeObject<SQLServerCredentials>(credentialsJSON);
-            return $"Server={credentials.host},{credentials.port};Initial Catalog={credentials.dbInstanceIdentifier};" +
+            return $"Server={credentials.host},{credentials.port};Initial Catalog=wiki-bot-data;" +
                 $"User Id={credentials.username};Password={credentials.password};";
         }
 
@@ -27,8 +27,8 @@ namespace WikiGameBot.Data.Loaders
             AmazonSecretsManagerConfig amazonSecretsManagerConfig = new AmazonSecretsManagerConfig();
             amazonSecretsManagerConfig.RegionEndpoint = RegionEndpoint.USEast2;
 
-            string AccessKeyID = Environment.GetEnvironmentVariable("AWS_ACCESSKEYID"); //"AKIA2DBVZSO64XP23Y73";
-            string SecretKey = Environment.GetEnvironmentVariable("AWS_SECRETKEY"); //"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";
+            string AccessKeyID = Environment.GetEnvironmentVariable("AWS_ACCESSKEYID");
+            string SecretKey = Environment.GetEnvironmentVariable("AWS_SECRETKEY"); 
             string VersionStage = null;
 
             IAmazonSecretsManager client = new AmazonSecretsManagerClient

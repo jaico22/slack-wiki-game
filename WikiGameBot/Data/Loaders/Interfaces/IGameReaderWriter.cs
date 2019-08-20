@@ -37,6 +37,19 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <returns></returns>
         DateTime GetThreadTs(int gameId);
 
+        /// <summary>
+        /// Add player to database if it's their first time playing
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="UserName"></param>
+        void AddUserIfFirstTimePlaying(string UserId, string UserName);
+
+        
+        /// <summary>
+        /// Generate stats for current game
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
         GameStatistics GetGameStatistics(int gameId);
     }
 }

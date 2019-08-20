@@ -20,20 +20,21 @@ namespace WikiGameBot.Bot
 
         List<WikiMessage> _wikiMessages = new List<WikiMessage>();
 
-        public SlackBot(string Token,ServiceProvider services)
+        public SlackBot(IGameReaderWriter gameReaderWriter, IDBServerInfoLoader dBServerInfoLoader)
         {
-            if (string.IsNullOrWhiteSpace(Token))
-            {
-                throw new ArgumentNullException();
-            }
-            _client = new SlackSocketClient(Token);
-            _gameReaderWriter = services.GetService<IGameReaderWriter>();
-            _dBServerInfoLoader = services.GetService<IDBServerInfoLoader>();
+            _gameReaderWriter = gameReaderWriter;
+            _dBServerInfoLoader = dBServerInfoLoader;
         }
 
         public void Connect()
         {
-            Console.WriteLine(_dBServerInfoLoader.GetConnectionString());
+            Console.WriteLine("Initializing Client");
+            string token = Environment.GetEnvironmentVariable("WIKI_BOT_USER_OATH_TOKEN");
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException();
+            }
+            _client = new SlackSocketClient(token);
 
             MessageProcessor processor = new MessageProcessor(_gameReaderWriter);
             Console.WriteLine("RTM Client Connecting...");
@@ -60,10 +61,10 @@ namespace WikiGameBot.Bot
 
             // Send heartbeat
             var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
-            _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
+            /*_client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
                 "Afterwards, reply to that post in the formal \"Start -> Click 1 -> Click 2 -> ... -> End\"\n" +
                 "Type \"wiki-bot: stats\" for records on the current game\n\n" +
-                "Note: This is the proof of concept version; Starting a new game will reset the client");
+                "Note: This is the proof of concept version; Starting a new game will reset the client");*/
 
 
             while (true) { };

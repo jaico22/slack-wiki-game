@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using WikiGameBot.Bot;
+using WikiGameBot.Data;
 using WikiGameBot.Data.Loaders;
 using WikiGameBot.Data.Loaders.Interfaces;
 
@@ -13,14 +14,12 @@ namespace WikiGameBot
         {
             // Depenecy Injection
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<IGameReaderWriter, MockGameReaderWriter>()
-                .AddSingleton<IDBServerInfoLoader, AWSRDSInfoLoader>()
+                .AddDbContext<WikiBotDataDbContext>()
+                .AddTransient<IGameReaderWriter, GameReaderWriter>()
+                .AddTransient<IDBServerInfoLoader, AWSRDSInfoLoader>()
+                .AddTransient<SlackBot>()
                 .BuildServiceProvider();
-
-            // Game
-            string token = Environment.GetEnvironmentVariable("WIKI_BOT_USER_OATH_TOKEN");
-            SlackBot bot = new SlackBot(token,serviceProvider);
-            bot.Connect();
+            serviceProvider.GetService<SlackBot>().Connect();
         }
     }
 }

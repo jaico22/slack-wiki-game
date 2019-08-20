@@ -15,7 +15,7 @@ namespace WikiGameBot.Core
         {
             // Clean Message
             var messageTextClean = messageText;
-            messageTextClean = messageTextClean.Replace("\\n", " ");
+            messageTextClean = messageTextClean.Replace("\n", " ");
             messageTextClean = messageTextClean.Replace("<", "");
             messageTextClean = messageTextClean.Replace(">", "");
 

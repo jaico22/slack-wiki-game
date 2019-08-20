@@ -16,8 +16,9 @@ namespace WikiGameBot.Data.Entities
         public DateTime ThreadTimeStamp { get; set; }
 
         /// <summary>
-        /// Representation of client associated with this game
+        /// Indication if game is active
         /// </summary>
-        public string ClientId { get; set; }
+        public bool IsActive { get; set; }
+
     }
 }
