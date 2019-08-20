@@ -25,13 +25,13 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         void CreateNewGame(NewMessage message);
 
         /// <summary>
-        /// Adds enntry to game
+        /// Adds entry to game
         /// </summary>
         /// <param name="gameEntry"></param>
         void AddGameEntry(GameEntry gameEntry);
 
         /// <summary>
-        /// Gets thread timestamp associated with <see cref="gameId"/>
+        /// Gets thread timestamp associated with <paramref name="gameId"/>
         /// </summary>
         /// <param name="gameId"></param>
         /// <returns></returns>
@@ -44,12 +44,30 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <param name="UserName"></param>
         void AddUserIfFirstTimePlaying(string UserId, string UserName);
 
-        
         /// <summary>
-        /// Generate stats for current game
+        /// Increment win-count associated with player
+        /// </summary>
+        /// <param name="UserId"></param>
+        void IncrementPlayerWinCount(string UserId);
+
+        /// <summary>
+        /// Increment entry-count associated with player speficied by <paramref name="UserId"/>
+        /// </summary>
+        /// <param name="UserId"></param>
+        void IncrementPlayerEntryCount(string UserId);
+
+        /// <summary>
+        /// Generate stats for game specificed by <paramref name="gameId"/>
         /// </summary>
         /// <param name="gameId"></param>
         /// <returns></returns>
         GameStatistics GetGameStatistics(int gameId);
+
+        /// <summary>
+        /// Returns best entry for game specificed by <paramref name="gameId"/>
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        Entities.GameEntry GetWinningEntry(int gameId);
     }
 }

@@ -11,7 +11,7 @@ namespace WikiGameBot.Data.Loaders
     public class MockGameReaderWriter : IGameReaderWriter
     {
         public DateTime _mockGameThreadTs { get; set; }
-        private List<GameEntry> gameEntries = new List<GameEntry>();
+        private List<Entities.GameEntry> gameEntries = new List<Entities.GameEntry>();
         public int FindGameId(NewMessage message)
         {
             Console.WriteLine($"Checking Game: ThreadTs={message.thread_ts}");
@@ -32,7 +32,14 @@ namespace WikiGameBot.Data.Loaders
 
         public void AddGameEntry(GameEntry gameEntry)
         {
-            gameEntries.Add(gameEntry);
+            Entities.GameEntry newGameEntry = new Entities.GameEntry();
+            newGameEntry.GameId = gameEntry.GameId;
+            newGameEntry.LinkCount = gameEntry.LinkCount;
+            newGameEntry.RawText = gameEntry.RawText;
+            newGameEntry.UserId = gameEntry.User;
+            newGameEntry.UserName = gameEntry.UserName;
+
+            gameEntries.Add(newGameEntry);
         }
 
         public DateTime GetThreadTs(int gameId)
@@ -62,6 +69,21 @@ namespace WikiGameBot.Data.Loaders
         public void AddUserIfFirstTimePlaying(string UserId, string UserName)
         {
             // Not needed in mockup
+        }
+
+        public void IncrementPlayerWinCount(string UserId)
+        {
+            // Not needed in mockup
+        }
+
+        public void IncrementPlayerEntryCount(string UserId)
+        {
+            // Not needed in mockup
+        }
+
+        public Entities.GameEntry GetWinningEntry(int gameId)
+        {
+            return gameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
         }
     }
 }

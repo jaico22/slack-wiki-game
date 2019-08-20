@@ -67,6 +67,7 @@ namespace WikiGameBot.Data.Loaders
             }
             return false;
         }
+
         public void CreateNewGame(NewMessage message)
         {
             // Prepare data for writing
@@ -106,6 +107,36 @@ namespace WikiGameBot.Data.Loaders
         public DateTime GetThreadTs(int gameId)
         {
             return _context.Games.Where(x => x.Id == gameId).Select(x => x.ThreadTimeStamp).FirstOrDefault();
+        }
+
+        public void IncrementPlayerWinCount(string UserId)
+        {
+            var player = GetPlayerByUserId(UserId);
+            if (player != null)
+            {
+                player.NumberOfWins++;
+                _context.Players.Update(player);
+            }
+        }
+
+        public void IncrementPlayerEntryCount(string UserId)
+        {
+            var player = GetPlayerByUserId(UserId);
+            if (player != null)
+            {
+                player.NumberOfEntries++;
+                _context.Players.Update(player);
+            }
+        }
+
+        private Player GetPlayerByUserId(string UserId)
+        {
+            return _context.Players.Where(x => x.SlackUserId == UserId).FirstOrDefault();
+        }
+
+        public Entities.GameEntry GetWinningEntry(int gameId)
+        {
+            return _context.GameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
         }
     }
 }
