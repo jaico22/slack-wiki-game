@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WikiGameBot.Bot;
 using WikiGameBot.Core;
 
 namespace WikiGameBot.Data.Loaders.Interfaces
@@ -36,6 +37,12 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <param name="gameId"></param>
         /// <returns></returns>
         DateTime GetThreadTs(int gameId);
+
+        /// <summary>
+        /// Ends game associated with <paramref name="gameId"/>
+        /// </summary>
+        /// <param name="gameId"></param>
+        PrintMessage EndGame(int gameId);
 
         /// <summary>
         /// Add player to database if it's their first time playing

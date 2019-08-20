@@ -14,6 +14,7 @@ namespace WikiGameBot.Data
     public class WikiBotDataDbContext : DbContext
     {
         public DbSet<Game> Games { get; set; }
+
         public DbSet<GameEntry> GameEntries { get; set; }
 
         public DbSet<Player> Players { get; set; }

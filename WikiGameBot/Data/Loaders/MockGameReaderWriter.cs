@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SlackAPI.WebSocketMessages;
+using WikiGameBot.Bot;
 using WikiGameBot.Core;
 using WikiGameBot.Data.Loaders.Interfaces;
 
@@ -84,6 +85,24 @@ namespace WikiGameBot.Data.Loaders
         public Entities.GameEntry GetWinningEntry(int gameId)
         {
             return gameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
+        }
+
+        public PrintMessage EndGame(int gameId)
+        {
+            PrintMessage printMessage = new PrintMessage();
+            printMessage.ThreadTs = _mockGameThreadTs;
+            printMessage.IsReply = true;
+
+            var winningEntry = GetWinningEntry(gameId);
+            if (winningEntry != null)
+            {
+                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with with their {winningEntry.LinkCount} long entry of \"{winningEntry.RawText}\"";
+            }
+            else
+            {
+                printMessage.MessageText = "Game Canceled";
+            }
+            return printMessage;
         }
     }
 }

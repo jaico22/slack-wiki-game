@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SlackAPI.WebSocketMessages;
+using WikiGameBot.Bot;
 using WikiGameBot.Core;
 using WikiGameBot.Data.Entities;
 using WikiGameBot.Data.Loaders.Interfaces;
@@ -26,6 +27,7 @@ namespace WikiGameBot.Data.Loaders
                 AddUserIfFirstTimePlaying(gameEntry.User, gameEntry.UserName);
                 Console.WriteLine($"User has not played; Adding entry...");
                 Console.WriteLine($"{gameEntry.ToString()}");
+
                 // Prepare Data for writing
                 Entities.GameEntry newGameEntry = new Entities.GameEntry();
                 newGameEntry.GameId = gameEntry.GameId;
@@ -85,8 +87,8 @@ namespace WikiGameBot.Data.Loaders
 
         public int FindGameId(NewMessage message)
         {
-            Console.WriteLine($"Checking if game exists on current thread (thread_ts={message.thread_ts})");
-            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts)
+            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive==true)
                                      .FirstOrDefault();
             if (game != null)
             {
@@ -137,6 +139,39 @@ namespace WikiGameBot.Data.Loaders
         public Entities.GameEntry GetWinningEntry(int gameId)
         {
             return _context.GameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
+        }
+
+        public PrintMessage EndGame(int gameId)
+        {
+            // Set Game to inactive
+            var game = _context.Games.Where(x => x.Id == gameId).FirstOrDefault();
+            game.IsActive = false;
+            _context.Games.Update(game);
+
+            // Prepare Print Message meta-data
+            PrintMessage printMessage = new PrintMessage();
+            printMessage.ThreadTs = game.ThreadTimeStamp;
+            printMessage.IsReply = true;
+
+            // Find winner and players that played
+            var winningEntry = GetWinningEntry(gameId);
+            if (winningEntry != null)
+            {
+                var playerIds = _context.GameEntries.Where(x => x.GameId == gameId).Select(x => x.UserId).ToList();
+                foreach (var playerId in playerIds)
+                {
+                    IncrementPlayerEntryCount(playerId);
+                }
+                IncrementPlayerWinCount(winningEntry.UserId);
+                // Return Winning String
+                printMessage.MessageText = $"Game ended! {winningEntry.UserId} wins with with their {winningEntry.LinkCount} link long entry of \"{winningEntry.RawText}\"";
+            }
+            else
+            {
+                printMessage.MessageText = "Game Canceled";
+            }
+            return printMessage;
+
         }
     }
 }
