@@ -34,10 +34,10 @@ namespace WikiGameBot.Data.Loaders
 
             string VersionStage = null;
 
-            //IAmazonSecretsManager client = new AmazonSecretsManagerClient
-            //     (AccessKeyID, SecretKey, amazonSecretsManagerConfig);
+            IAmazonSecretsManager client = new AmazonSecretsManagerClient
+                 (AccessKeyID, SecretKey, amazonSecretsManagerConfig);
 
-            IAmazonSecretsManager client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName("us-east-2"));
+            //IAmazonSecretsManager client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName("us-east-2"));
 
             GetSecretValueRequest request = new GetSecretValueRequest();
             request.SecretId = secretName;
