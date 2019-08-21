@@ -1,6 +1,9 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      dotnet: 2.0
   build:
     commands:
       - dotnet restore WikiGameBot/WikiGameBot.csproj
