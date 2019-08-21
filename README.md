@@ -21,10 +21,12 @@ e.g:
 ## TODOs
 <del>1. Database Integration</del>
 
-2. Implement Game Stastics
+<del>2. Implement Game Stastics</del>
 
-3. Path Confirmation
+<del>3. Add more in-game feedback</del>
 
-4. Reactions to indicate curernt winner
+4. Path Confirmation
 
-5. Automated Game Completion
+5. Reactions to indicate current winner
+
+6. Automated Game Completion

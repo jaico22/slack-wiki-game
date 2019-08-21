@@ -31,7 +31,7 @@ namespace WikiGameBot.Data.Loaders
             _mockGameThreadTs = message.ts;
         }
 
-        public void AddGameEntry(GameEntry gameEntry)
+        public LoaderResponse AddGameEntry(GameEntry gameEntry)
         {
             Entities.GameEntry newGameEntry = new Entities.GameEntry();
             newGameEntry.GameId = gameEntry.GameId;
@@ -41,6 +41,8 @@ namespace WikiGameBot.Data.Loaders
             newGameEntry.UserName = gameEntry.UserName;
 
             gameEntries.Add(newGameEntry);
+
+            return LoaderResponse.Success;
         }
 
         public DateTime GetThreadTs(int gameId)

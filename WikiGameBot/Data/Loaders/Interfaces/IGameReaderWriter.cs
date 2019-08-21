@@ -29,7 +29,7 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// Adds entry to game
         /// </summary>
         /// <param name="gameEntry"></param>
-        void AddGameEntry(GameEntry gameEntry);
+        LoaderResponse AddGameEntry(GameEntry gameEntry);
 
         /// <summary>
         /// Gets thread timestamp associated with <paramref name="gameId"/>
