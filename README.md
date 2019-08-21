@@ -5,7 +5,7 @@ _Note: Very much a work-in-progress; A proof-of-concept currently lives on maste
 
 ## Notes for building
 - Set the enviorment variable "WIKI_BOT_USER_OATH_TOKEN" to the bot user OATH token before building
-
+- Modify SecretsManager 
 ## Play Instructions
 1. Start a challenge by posting two links into the slack channel.
 
@@ -19,7 +19,12 @@ e.g:
   > Buddy Guy -> Chicago -> China -> Japan -> Japanese Noodles -> Ramen
   
 ## TODOs
-1. Database Integration
-2. Aggregate Stastics
-3. Automated Game Completion
-4. Path Confirmation
+<del>1. Database Integration</del>
+
+2. Implement Game Stastics
+
+3. Path Confirmation
+
+4. Reactions to indicate curernt winner
+
+5. Automated Game Completion

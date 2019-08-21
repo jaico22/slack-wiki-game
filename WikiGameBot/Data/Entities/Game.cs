@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace WikiGameBot.Data
+namespace WikiGameBot.Data.Entities
 {
     public class Game
     {
@@ -15,5 +15,9 @@ namespace WikiGameBot.Data
         /// </summary>
         public DateTime ThreadTimeStamp { get; set; }
 
+        /// <summary>
+        /// Indication if game is active
+        /// </summary>
+        public bool IsActive { get; set; }
     }
 }

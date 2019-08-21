@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SlackAPI.WebSocketMessages;
+using WikiGameBot.Bot;
 using WikiGameBot.Core;
 using WikiGameBot.Data.Loaders.Interfaces;
 
@@ -11,7 +12,7 @@ namespace WikiGameBot.Data.Loaders
     public class MockGameReaderWriter : IGameReaderWriter
     {
         public DateTime _mockGameThreadTs { get; set; }
-        private List<GameEntry> gameEntries = new List<GameEntry>();
+        private List<Entities.GameEntry> gameEntries = new List<Entities.GameEntry>();
         public int FindGameId(NewMessage message)
         {
             Console.WriteLine($"Checking Game: ThreadTs={message.thread_ts}");
@@ -32,7 +33,14 @@ namespace WikiGameBot.Data.Loaders
 
         public void AddGameEntry(GameEntry gameEntry)
         {
-            gameEntries.Add(gameEntry);
+            Entities.GameEntry newGameEntry = new Entities.GameEntry();
+            newGameEntry.GameId = gameEntry.GameId;
+            newGameEntry.LinkCount = gameEntry.LinkCount;
+            newGameEntry.RawText = gameEntry.RawText;
+            newGameEntry.UserId = gameEntry.User;
+            newGameEntry.UserName = gameEntry.UserName;
+
+            gameEntries.Add(newGameEntry);
         }
 
         public DateTime GetThreadTs(int gameId)
@@ -57,6 +65,44 @@ namespace WikiGameBot.Data.Loaders
             gameStatistics.CurrentWinner = bestEntry.UserName;
 
             return gameStatistics;
+        }
+
+        public void AddUserIfFirstTimePlaying(string UserId, string UserName)
+        {
+            // Not needed in mockup
+        }
+
+        public void IncrementPlayerWinCount(string UserId)
+        {
+            // Not needed in mockup
+        }
+
+        public void IncrementPlayerEntryCount(string UserId)
+        {
+            // Not needed in mockup
+        }
+
+        public Entities.GameEntry GetWinningEntry(int gameId)
+        {
+            return gameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
+        }
+
+        public PrintMessage EndGame(int gameId)
+        {
+            PrintMessage printMessage = new PrintMessage();
+            printMessage.ThreadTs = _mockGameThreadTs;
+            printMessage.IsReply = true;
+
+            var winningEntry = GetWinningEntry(gameId);
+            if (winningEntry != null)
+            {
+                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with with their {winningEntry.LinkCount} long entry of \"{winningEntry.RawText}\"";
+            }
+            else
+            {
+                printMessage.MessageText = "Game Canceled";
+            }
+            return printMessage;
         }
     }
 }
