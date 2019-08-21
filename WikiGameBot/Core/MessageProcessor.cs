@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using WikiGameBot.Bot;
+using WikiGameBot.Data.Loaders;
 using WikiGameBot.Data.Loaders.Interfaces;
 
 namespace WikiGameBot.Core
@@ -27,6 +28,7 @@ namespace WikiGameBot.Core
             {
                 Console.WriteLine("New Game Started");
                 _gameReaderWriter.CreateNewGame(message);
+                return new PrintMessage { IsReply = true, MessageText = $"New Game Started! To end game, type \n> wiki-bot: end game", ThreadTs = message.ts };
             }
             else
             {
@@ -51,16 +53,30 @@ namespace WikiGameBot.Core
                     }
 
                     int linkCount = GenerateLinkCount(message);
-                    // TODO: Username is showing as null occasionally
-                    _gameReaderWriter.AddGameEntry(new GameEntry
+
+                    // Only process valid messages (e.g. ignore a normal conversation)
+                    if (linkCount > 0)
                     {
-                        LinkCount = linkCount,
-                        User = message.user,
-                        RawText = message.text,
-                        UserName = message.username,
-                        GameId = gameId
-                    });
-                    
+                        var responce = _gameReaderWriter.AddGameEntry(new GameEntry
+                        {
+                            LinkCount = linkCount,
+                            User = message.user,
+                            RawText = message.text,
+                            UserName = message.username,
+                            GameId = gameId
+                        });
+
+                        if (responce == LoaderResponse.Success)
+                        {
+                            return new PrintMessage { IsReply = true, MessageText = $"{message.username}'s Entry Received! Number of clicks: {linkCount}", ThreadTs = message.thread_ts };
+                        }
+                        else
+                        {
+                            return new PrintMessage { IsReply = true, MessageText = $"You have already played this round. You only get one chance per game", ThreadTs = message.thread_ts };
+                        }
+
+                    }
+
                 }
 
             }
@@ -69,20 +85,33 @@ namespace WikiGameBot.Core
 
         private PrintMessage PrintStats(GameStatistics stats, int gameId)
         {
-            return new PrintMessage
+            if (stats != null)
             {
-                IsReply = true,
-                MessageText = $"{stats.CurrentWinner} is currently winning with a score of {stats.BestEntry}.\n" +
-                    $">{stats.BestEntryMessage}",
-                ThreadTs = _gameReaderWriter.GetThreadTs(gameId)
-            };
+                return new PrintMessage
+                {
+                    IsReply = true,
+                    MessageText = $"{stats.CurrentWinner} is currently winning with a score of {stats.BestEntry}.\n" +
+                        $">{stats.BestEntryMessage}",
+                    ThreadTs = _gameReaderWriter.GetThreadTs(gameId)
+                };
+            }
+            else
+            {
+                return new PrintMessage
+                {
+                    IsReply = true,
+                    MessageText = "No one has played yet, stats can't get generated",
+                    ThreadTs = _gameReaderWriter.GetThreadTs(gameId)
+                };
+            }
+
         }
 
         private int GenerateLinkCount(NewMessage message)
         {
             List<string> pageList = _pageListExtractor.GeneratePageList(message.text);
             Console.WriteLine($"User: {message.user} #Links: {pageList.Count}");
-            return pageList.Count;
+            return pageList.Count-1;
         }
 
         private bool CheckIfMessageIsANewGame(NewMessage message)

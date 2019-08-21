@@ -75,8 +75,10 @@ namespace WikiGameBot.Bot
             // Send heartbeat
             var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
             _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
-                "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page\"\n" +
-                "Note: This is the proof of concept version; Starting a new game will reset the client");
+                "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page\"\n\n" +
+                "What's new since last time:\n" +
+                "   - Stats have been implemented: Type \"wiki-bot stats\" to view whos winning the current game\n" +
+                "   - More feedback, so you'll know when the bot is working" );
 
 
             while (true) { };
