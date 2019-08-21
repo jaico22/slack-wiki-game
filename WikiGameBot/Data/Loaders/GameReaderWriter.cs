@@ -19,9 +19,8 @@ namespace WikiGameBot.Data.Loaders
             _context = context;
         }
 
-        public void AddGameEntry(Core.GameEntry gameEntry)
+        public LoaderResponse AddGameEntry(Core.GameEntry gameEntry)
         {
-            // TODO Add method of feedback if user has allready entered
             if (CheckIfUserHasPlayed(gameEntry.User, gameEntry.GameId) == false)
             {
                 AddUserIfFirstTimePlaying(gameEntry.User, gameEntry.UserName);
@@ -39,6 +38,10 @@ namespace WikiGameBot.Data.Loaders
                 // Write changes to database
                 _context.GameEntries.Add(newGameEntry);
                 _context.SaveChanges();
+                return LoaderResponse.Success;
+            }else
+            {
+                return LoaderResponse.RequestDenied;
             }
 
         }
@@ -103,7 +106,25 @@ namespace WikiGameBot.Data.Loaders
 
         public GameStatistics GetGameStatistics(int gameId)
         {
-            throw new NotImplementedException();
+            var bestEntry = _context.GameEntries.Where(x => x.GameId == gameId).OrderBy(x => x.LinkCount).FirstOrDefault();
+            var worstEntry = _context.GameEntries.Where(x => x.GameId == gameId).OrderByDescending(x => x.LinkCount).FirstOrDefault();
+
+            GameStatistics gameStatistics = new GameStatistics();
+            if (bestEntry != null)
+            {
+                gameStatistics.BestEntry = bestEntry.LinkCount;
+                gameStatistics.BestEntryMessage = bestEntry.RawText;
+                gameStatistics.WorstEntry = worstEntry.LinkCount;
+                gameStatistics.WorstEntryMessage = worstEntry.RawText;
+                gameStatistics.CurrentWinner = bestEntry.UserName;
+            }
+            else
+            {
+                gameStatistics = null;
+            }
+
+            return gameStatistics;
+
         }
 
         public DateTime GetThreadTs(int gameId)
@@ -164,7 +185,7 @@ namespace WikiGameBot.Data.Loaders
                 }
                 IncrementPlayerWinCount(winningEntry.UserId);
                 // Return Winning String
-                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with with their {winningEntry.LinkCount} link long entry of \"{winningEntry.RawText}\"";
+                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with {winningEntry.LinkCount} click long entry of \"{winningEntry.RawText}\"";
             }
             else
             {
