@@ -23,7 +23,7 @@ namespace WikiGameBot.Data.Loaders
             var players = _context.Players.ToList();
             Console.WriteLine($"Database connection test passed\n#Players={players.Count()}");
         }
-        public void AddGameEntry(Core.GameEntry gameEntry)
+        public LoaderResponse AddGameEntry(Core.GameEntry gameEntry)
         {
             if (CheckIfUserHasPlayed(gameEntry.User, gameEntry.GameId) == false)
             {
