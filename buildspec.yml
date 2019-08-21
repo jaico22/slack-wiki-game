@@ -8,7 +8,7 @@ phases:
     commands:
       - dotnet restore WikiGameBot/WikiGameBot.csproj
       - dotnet build WikiGameBot/WikiGameBot.csproj
-      - dotnet publish WikiGameBot/WikiGameBot.csproj -o ./staging/app
+      - dotnet publish WikiGameBot/WikiGameBot.csproj -o ./staging/app --self-contained true
 artifacts:
   files:
     - '**/*'
