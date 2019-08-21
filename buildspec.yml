@@ -3,8 +3,9 @@ version: 0.2
 phases:
   build:
     commands:
-      - dotnet restore
-      - dotnet build
+      - dotnet restore WikiGameBot/WikiGameBot.csproj
+      - dotnet build WikiGameBot/WikiGameBot.csproj
+      - dotnet publish WikiGameBot/WikiGameBot.csproj -o ./staging/app
 artifacts:
   files:
-    - .\bin\Debug\netcoreapp2.0\*
+    - '**/*'
