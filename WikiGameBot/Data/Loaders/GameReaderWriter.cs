@@ -18,6 +18,11 @@ namespace WikiGameBot.Data.Loaders
         {
             _context = context;
         }
+        public void TestDatabaseConnection()
+        {
+            var players = _context.Players.ToList();
+            Console.WriteLine($"Database connection test passed\n#Players={players.Count()}");
+        }
 
         public LoaderResponse AddGameEntry(Core.GameEntry gameEntry)
         {

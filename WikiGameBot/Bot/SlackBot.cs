@@ -39,7 +39,9 @@ namespace WikiGameBot.Bot
             MessageProcessor processor = new MessageProcessor(_gameReaderWriter);
             Console.WriteLine("RTM Client Connecting...");
             ManualResetEventSlim clientReady = new ManualResetEventSlim(false);
-            
+
+            _gameReaderWriter.TestDatabaseConnection();
+
             _client.Connect((connected) => {
                 // This is called once the client has emitted the RTM start command
                 clientReady.Set();
