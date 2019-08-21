@@ -76,5 +76,7 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <param name="gameId"></param>
         /// <returns></returns>
         Entities.GameEntry GetWinningEntry(int gameId);
+
+        void TestDatabaseConnection();
     }
 }

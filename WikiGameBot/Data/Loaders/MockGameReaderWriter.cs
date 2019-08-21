@@ -104,5 +104,10 @@ namespace WikiGameBot.Data.Loaders
             }
             return printMessage;
         }
+
+        public void TestDatabaseConnection()
+        {
+            //
+        }
     }
 }
