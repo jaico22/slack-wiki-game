@@ -1,0 +1,30 @@
+version: 0.0
+os: linux
+files:
+  - source: WikiGameBot/Staging/App
+    destination: /home/ec2-user/wiki-game-bot
+  
+hooks:
+  ApplicationStop:
+    - location: scripts/stop_service
+      timeout: 300
+      runas: root
+
+  BeforeInstall:
+    - location: scripts/remove_application
+      timeout: 300
+      runas: root
+
+  AfterInstall:
+    - location: scripts/install_dotnetcore
+      timeout: 500
+      runas: root
+
+    - location: scripts/install_httpd
+      timeout: 300
+      runas: root
+
+  ApplicationStart:
+    - location: scripts/start_service
+      timeout: 300
+      runas: root
