@@ -27,12 +27,9 @@ namespace WikiGameBot.Data.Loaders
             AmazonSecretsManagerConfig amazonSecretsManagerConfig = new AmazonSecretsManagerConfig();
             amazonSecretsManagerConfig.RegionEndpoint = RegionEndpoint.USEast2;
 
-            string AccessKeyID = Environment.GetEnvironmentVariable("AWS_ACCESSKEYID");
-            string SecretKey = Environment.GetEnvironmentVariable("AWS_SECRETKEY"); 
             string VersionStage = null;
 
-            IAmazonSecretsManager client = new AmazonSecretsManagerClient
-                 (AccessKeyID, SecretKey, amazonSecretsManagerConfig);
+            IAmazonSecretsManager client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName("us-east-2"));
 
             GetSecretValueRequest request = new GetSecretValueRequest();
             request.SecretId = secretName;
