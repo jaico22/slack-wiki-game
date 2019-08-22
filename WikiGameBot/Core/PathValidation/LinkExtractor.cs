@@ -33,6 +33,17 @@ namespace WikiGameBot.Core.PathValidation
                 var newWikiLink = new WikiLink();
                 newWikiLink.LinkText = link.InnerText;
                 newWikiLink.Url = link.GetAttributeValue("href", null);
+                if (string.IsNullOrEmpty(newWikiLink.Url) == false) {
+                    switch (newWikiLink.Url[0])
+                    {
+                        case '/':
+                            newWikiLink.Url = $"https://en.wikipedia.org{newWikiLink.Url}";
+                            break;
+                        case '#':
+                            newWikiLink.Url = $"{url}{newWikiLink.Url}";
+                            break;
+                    }
+                }
                 newWikiLink.PageTitle = link.GetAttributeValue("title", null);
                 wikiLinks.Add(newWikiLink);
             }

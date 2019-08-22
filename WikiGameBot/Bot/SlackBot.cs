@@ -26,7 +26,7 @@ namespace WikiGameBot.Bot
             _dBServerInfoLoader = dBServerInfoLoader;
         }
 
-        public void Connect()
+        public async Task Connect()
         {
             Console.WriteLine("Initializing Client");
             string token = Environment.GetEnvironmentVariable("WIKI_BOT_USER_OATH_TOKEN");
@@ -46,7 +46,7 @@ namespace WikiGameBot.Bot
             }, () => {
                 // This is called once the RTM client has connected to the end point
             });
-            _client.OnMessageReceived += (message) =>
+            _client.OnMessageReceived += async (message) =>
             {
                 // Ignore Bots
                 if (message.user != null)
@@ -57,7 +57,7 @@ namespace WikiGameBot.Bot
                     Console.WriteLine(poster.real_name);
                     message.username = poster.real_name;
 
-                    var res = processor.ProcessMessage(message);
+                    var res = await processor.ProcessMessage(message);
                     if (res != null)
                     {
                         var chan = _client.Channels.Find(x => x.name.Equals("wikigame"));
@@ -73,17 +73,10 @@ namespace WikiGameBot.Bot
             // Send heartbeat
             var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
             _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
-                "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page\"\n\n" +
-                "What's new since last time:\n" +
-                "   - Stats have been implemented: Type \"wiki-bot stats\" to view whos winning the current game\n" +
-                "   - More feedback, so you'll know when the bot is working" );
+                "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page");
 
 
             while (true) { };
         }
-
-        
-
-
     }
 }

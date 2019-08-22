@@ -2,7 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using WikiGameBot.Bot;
+using WikiGameBot.Core.PathValidation;
+using WikiGameBot.Data.Entities;
 using WikiGameBot.Data.Loaders;
 using WikiGameBot.Data.Loaders.Interfaces;
 
@@ -15,72 +18,89 @@ namespace WikiGameBot.Core
         private readonly IGameReaderWriter _gameReaderWriter;
         private readonly PageListExtractor _pageListExtractor;
         private readonly WikipediaLinkExtractor _wikipediaLinkExtractor;
+        private readonly PathValidator _pathValidator;
         public MessageProcessor(IGameReaderWriter gameReaderWriter)
         {
             _gameReaderWriter = gameReaderWriter;
             _wikipediaLinkExtractor = new WikipediaLinkExtractor();
             _pageListExtractor = new PageListExtractor();
+            _pathValidator = new PathValidator();
         }
 
-        public PrintMessage ProcessMessage(NewMessage message)
+        public async Task<PrintMessage> ProcessMessage(NewMessage message)
         {
-            if (CheckIfMessageIsANewGame(message))
+            // Check if a new game has started
+            GameStartData gameStartData = GetGameStartData(message);
+            if (gameStartData.IsValid)
             {
                 Console.WriteLine("New Game Started");
-                _gameReaderWriter.CreateNewGame(message);
+                _gameReaderWriter.CreateNewGame(gameStartData);
                 return new PrintMessage { IsReply = true, MessageText = $"New Game Started! To end game, type \n> wiki-bot: end game", ThreadTs = message.ts };
             }
             else
             {
-                var gameId = _gameReaderWriter.FindGameId(message);
-                if (gameId != -1)
+                var game = _gameReaderWriter.GetGame(message);
+
+                if (game != null)
                 {
                     switch (message.text.ToLower().Trim())
                     {
                         case "wiki-bot stats":
                         case "wiki-bot: stats":
-                            var stats = _gameReaderWriter.GetGameStatistics(gameId);
-                            return PrintStats(stats, gameId);
+                            var stats = _gameReaderWriter.GetGameStatistics(game.Id);
+                            return PrintStats(stats, game.Id);
                         case "wiki-bot end":
                         case "wiki-bot end game":
                         case "wiki-bot endgame":
                         case "wiki-bot: end":
                         case "wiki-bot: end game":
                         case "wiki-bot: endgame":
-                            return _gameReaderWriter.EndGame(gameId);
+                            return _gameReaderWriter.EndGame(game.Id);
                         default:
                             break;
                     }
 
-                    int linkCount = GenerateLinkCount(message);
+                    var pathValidationOutput = await FindAndProcessPath(game, message);
 
-                    // Only process valid messages (e.g. ignore a normal conversation)
-                    if (linkCount > 0)
+                    // Only process valid messages as determined by validator output
+                    if (pathValidationOutput!=null && pathValidationOutput.IsValid)
                     {
                         var responce = _gameReaderWriter.AddGameEntry(new GameEntry
                         {
-                            LinkCount = linkCount,
+                            LinkCount = pathValidationOutput.PathLength,
                             User = message.user,
                             RawText = message.text,
                             UserName = message.username,
-                            GameId = gameId
+                            GameId = game.Id
                         });
 
                         if (responce == LoaderResponse.Success)
                         {
-                            return new PrintMessage { IsReply = true, MessageText = $"{message.username}'s Entry Received! Number of clicks: {linkCount}", ThreadTs = message.thread_ts };
+                            return new PrintMessage { IsReply = true, MessageText = $"{message.username}'s Entry Received! Number of clicks: {pathValidationOutput.PathLength}", ThreadTs = message.thread_ts };
                         }
                         else
                         {
                             return new PrintMessage { IsReply = true, MessageText = $"You have already played this round. You only get one chance per game", ThreadTs = message.thread_ts };
                         }
-
+                    }
+                    else
+                    {
+                        if (pathValidationOutput != null)
+                        {
+                            return new PrintMessage { IsReply = true, MessageText = pathValidationOutput.ValidationMessage, ThreadTs = message.thread_ts };
+                        }
                     }
 
                 }
 
             }
             return null;
+        }
+
+        private async Task<ValidationData> FindAndProcessPath(Game game, NewMessage message)
+        {
+            var path = _pageListExtractor.GeneratePageList(message.text);
+            return await _pathValidator.Validate(game, path);
         }
 
         private PrintMessage PrintStats(GameStatistics stats, int gameId)
@@ -107,17 +127,20 @@ namespace WikiGameBot.Core
 
         }
 
-        private int GenerateLinkCount(NewMessage message)
-        {
-            List<string> pageList = _pageListExtractor.GeneratePageList(message.text);
-            Console.WriteLine($"User: {message.user} #Links: {pageList.Count}");
-            return pageList.Count-1;
-        }
-
-        private bool CheckIfMessageIsANewGame(NewMessage message)
+        /// <summary>
+        /// Processes message and determine if a new game should be started. 
+        /// Metadata related to the game is stored in the 'GameStartData' Object
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private GameStartData GetGameStartData(NewMessage message)
         {
             List<string> wikipediaLinks = _wikipediaLinkExtractor.ExtractWikipediaLinks(message.text);
-            return wikipediaLinks.Count == 2;
+            if (wikipediaLinks.Count == 2)
+            {
+                return new GameStartData { IsValid = true, StartingUrl = wikipediaLinks[0], EndingUrl = wikipediaLinks[1],  ThreadTs = message.ts};
+            }
+            return new GameStartData { IsValid = false };
         }
 
     }

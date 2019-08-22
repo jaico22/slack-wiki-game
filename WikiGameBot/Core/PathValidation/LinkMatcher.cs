@@ -10,6 +10,7 @@ namespace WikiGameBot.Core.PathValidation
 
         public WikiLink FindLink(string linkTitle)
         {
+            WikiLink BestLink = null; 
             foreach(var link in wikiLinks)
             {
                 // Check for exact matches
@@ -26,12 +27,12 @@ namespace WikiGameBot.Core.PathValidation
                 var similarPageTitleMatch = string.IsNullOrEmpty(link.PageTitle) == false? 
                     LevenshteinDistance(link.PageTitle, linkTitle) <= maxLevenshteinDistance : false;
 
+                // Don't immediately return a similar match, there might be an exact match somwhere else
                 if (similarLinkTitleMatch || similarPageTitleMatch)
-                    return link;
+                    BestLink = link;
             }
 
-            // No links found return null
-            return null;
+            return BestLink;
         }
 
         public static int LevenshteinDistance(string s, string t)
