@@ -124,5 +124,10 @@ namespace WikiGameBot.Data.Loaders
             }
             return null;
         }
+
+        public List<Player> GetLeaderBoard(int limit)
+        {
+            return null;
+        }
     }
 }

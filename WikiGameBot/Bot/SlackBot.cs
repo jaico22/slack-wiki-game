@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SlackAPI;
 using WikiGameBot.Core;
+using WikiGameBot.Core.LeaderBoard;
 using WikiGameBot.Data.Loaders;
 using WikiGameBot.Data.Loaders.Interfaces;
 
@@ -17,13 +18,14 @@ namespace WikiGameBot.Bot
 
         private IDBServerInfoLoader _dBServerInfoLoader;
         private IGameReaderWriter _gameReaderWriter;
-
+        private readonly LeaderBoardGenerator _leaderBoardGenerator;
         List<WikiMessage> _wikiMessages = new List<WikiMessage>();
 
         public SlackBot(IGameReaderWriter gameReaderWriter, IDBServerInfoLoader dBServerInfoLoader)
         {
             _gameReaderWriter = gameReaderWriter;
             _dBServerInfoLoader = dBServerInfoLoader;
+            _leaderBoardGenerator = new LeaderBoardGenerator(_gameReaderWriter);
         }
 
         public async Task Connect()
@@ -62,9 +64,16 @@ namespace WikiGameBot.Bot
                     var res = await processor.ProcessMessage(message);
                     if (res != null)
                     {
-                        var chan = _client.Channels.Find(x => x.name.Equals("wikigame"));
-                        var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
-                        _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText, thread_ts: thread_ts);
+                        var chan = _client.Channels.Find(x => x.name.Equals("wiki-game-test-chan"));
+                        if (res.ThreadTs.HasValue)
+                        {
+                            var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
+                            _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText, thread_ts: thread_ts);
+                        }
+                        else
+                        {
+                            _client.PostMessage(x => Console.WriteLine(res), chan.id, res.MessageText);
+                        }
                     }
                 }
 
@@ -73,10 +82,15 @@ namespace WikiGameBot.Bot
             clientReady.Wait();
 
             // Send heartbeat
-            var c = _client.Channels.Find(x => x.name.Equals("wikigame"));
+            var c = _client.Channels.Find(x => x.name.Equals("wiki-game-test-chan"));
             _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
                 "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page");
 
+            // Generate Leadboard
+            var leaderboardString = _leaderBoardGenerator.GenerateLeaderBoardString();
+            if (string.IsNullOrEmpty(leaderboardString) == false) { 
+                _client.PostMessage(x => Console.WriteLine(x.error), c.id, $"{leaderboardString}\nType \"wiki-bot: leaderboard\" to bring back the leader board at any time.");
+            }
 
             while (true) { };
         }
