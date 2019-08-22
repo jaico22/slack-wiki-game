@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using WikiGameBot.Bot;
+using WikiGameBot.Core.LeaderBoard;
 using WikiGameBot.Core.PathValidation;
 using WikiGameBot.Data.Entities;
 using WikiGameBot.Data.Loaders;
@@ -19,16 +20,39 @@ namespace WikiGameBot.Core
         private readonly PageListExtractor _pageListExtractor;
         private readonly WikipediaLinkExtractor _wikipediaLinkExtractor;
         private readonly PathValidator _pathValidator;
+        private readonly LeaderBoardGenerator _leaderBoardGenerator;
+
         public MessageProcessor(IGameReaderWriter gameReaderWriter)
         {
             _gameReaderWriter = gameReaderWriter;
             _wikipediaLinkExtractor = new WikipediaLinkExtractor();
             _pageListExtractor = new PageListExtractor();
+            _leaderBoardGenerator = new LeaderBoardGenerator(_gameReaderWriter);
             _pathValidator = new PathValidator();
         }
 
         public async Task<PrintMessage> ProcessMessage(NewMessage message)
         {
+            // Check Global Commands
+            switch (message.text.ToLower().Trim())
+            {
+                case "wiki-bot: leaders":
+                case "wiki-bot leaders":
+                case "wiki-bot: leaderboard":
+                case "wiki-bot leaderboard":
+                case "wiki-bot leader board":
+                case "wiki-bot: leader board":
+                    var leaderboardString = _leaderBoardGenerator.GenerateLeaderBoardString();
+                    if (string.IsNullOrEmpty(leaderboardString))
+                    {
+                        return new PrintMessage { IsReply = false, MessageText = "No players are playering; Cannot generate leaderboard" };
+                    }
+                    else
+                    {
+                        return new PrintMessage { IsReply = false, MessageText = leaderboardString };
+                    }
+            }
+
             // Check if a new game has started
             GameStartData gameStartData = GetGameStartData(message);
             if (gameStartData.IsValid)

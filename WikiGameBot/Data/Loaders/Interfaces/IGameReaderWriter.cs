@@ -86,5 +86,12 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <param name="message"></param>
         /// <returns></returns>
         Game GetGame(NewMessage message);
+
+        /// <summary>
+        /// Returns list of top <paramref name="limit"/> players
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        List<Player> GetLeaderBoard(int limit);
     }
 }
