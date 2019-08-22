@@ -13,13 +13,13 @@ namespace Tests
         public string _url { get; set; }
         public List<WikiLink> _linkList { get; set; }
 
-        private readonly LinkExtractorProcessor _linkExtractorProcessor;
+        private readonly LinkExtractor _linkExtractor;
 
         private readonly LinkMatcher _linkMatcher;
 
         public LinkExtractionTests()
         {
-            _linkExtractorProcessor = new LinkExtractorProcessor();
+            _linkExtractor = new LinkExtractor();
             _linkMatcher = new LinkMatcher();
         }
 
@@ -74,7 +74,7 @@ namespace Tests
 
         private async Task WhenTheLinksAreExtracted()
         {
-            _linkList = await _linkExtractorProcessor.GeneratePageLinks(_url);
+            _linkList = await _linkExtractor.GeneratePageLinks(_url);
         }
 
         private void ThenThisLinkCanBeFound(WikiLink wikiLink)

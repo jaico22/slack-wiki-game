@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace WikiGameBot.Core.PathValidation
 {
-    public class LinkExtractorProcessor
+    public class LinkExtractor
     {
         public HttpClient _httpClient { get; set; }
 
-        public LinkExtractorProcessor()
+        public LinkExtractor()
         {
             _httpClient = new HttpClient();
         }
