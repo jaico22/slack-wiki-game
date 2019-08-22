@@ -49,7 +49,7 @@ namespace WikiGameBot.Core.PathValidation
                         else
                         {
                             validationData.IsValid = false;
-                            validationData.ValidationMessage = $"I couldn't find a reference to \"{link}\" on the \"{prevLink}\" page :thinking_face:";
+                            validationData.ValidationMessage = $"I couldn't find a reference to \"{link}\" on the \"{prevLink}\" page :thinking_face: \nThis could be caused by ambiguous links on the page. Try changing {prevLink} to the article title instead to clear up any ambiguity. ";
                             return validationData;
                         }
                     }

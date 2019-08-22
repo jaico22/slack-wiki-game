@@ -220,5 +220,10 @@ namespace WikiGameBot.Data.Loaders
                                      .FirstOrDefault();
             return game;
         }
+
+        public List<Player> GetLeaderBoard(int limit)
+        {
+            return _context.Players.OrderByDescending(x => x.NumberOfWins).ThenBy(x=>x.NumberOfEntries).Take(limit).ToList();
+        }
     }
 }
