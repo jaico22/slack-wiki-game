@@ -15,11 +15,10 @@ namespace WikiGameBot.Core.PathValidation
             
             // Check for amiguity
             var matchingLinkTexts = wikiLinks.Where(x => x.LinkText == linkTitle).ToList();
-            var matchingPageTitles = wikiLinks.Where(x => x.PageTitle == linkTitle).ToList();
-
             if (matchingLinkTexts.Count() == 1)
                 return matchingLinkTexts[0];
 
+            var matchingPageTitles = wikiLinks.Where(x => x.PageTitle == linkTitle).ToList();
             if (matchingPageTitles.Count() == 1)
                 return matchingPageTitles[0];
 
