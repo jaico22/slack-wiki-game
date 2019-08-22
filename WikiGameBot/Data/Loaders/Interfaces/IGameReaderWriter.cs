@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using WikiGameBot.Bot;
 using WikiGameBot.Core;
+using WikiGameBot.Data.Entities;
 
 namespace WikiGameBot.Data.Loaders.Interfaces
 {
@@ -20,16 +21,16 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         int FindGameId(NewMessage message);
 
         /// <summary>
-        /// Creates a new game
+        /// Adds new game to database
         /// </summary>
-        /// <param name="message"></param>
-        void CreateNewGame(NewMessage message);
+        /// <param name="gameStartData">Contains metadata replated to the game that will be added</param>
+        void CreateNewGame(GameStartData gameStartData);
 
         /// <summary>
         /// Adds entry to game
         /// </summary>
         /// <param name="gameEntry"></param>
-        LoaderResponse AddGameEntry(GameEntry gameEntry);
+        LoaderResponse AddGameEntry(Core.GameEntry gameEntry);
 
         /// <summary>
         /// Gets thread timestamp associated with <paramref name="gameId"/>
@@ -78,5 +79,12 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         Entities.GameEntry GetWinningEntry(int gameId);
 
         void TestDatabaseConnection();
+
+        /// <summary>
+        /// Returns Game Entity associated with <paramref name="message"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        Game GetGame(NewMessage message);
     }
 }

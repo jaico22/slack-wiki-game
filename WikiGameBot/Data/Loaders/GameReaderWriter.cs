@@ -23,6 +23,7 @@ namespace WikiGameBot.Data.Loaders
             var players = _context.Players.ToList();
             Console.WriteLine($"Database connection test passed\n#Players={players.Count()}");
         }
+
         public LoaderResponse AddGameEntry(Core.GameEntry gameEntry)
         {
             if (CheckIfUserHasPlayed(gameEntry.User, gameEntry.GameId) == false)
@@ -77,19 +78,29 @@ namespace WikiGameBot.Data.Loaders
             return false;
         }
 
-        public void CreateNewGame(NewMessage message)
+        public void CreateNewGame(GameStartData gameStartData)
         {
             // Prepare data for writing
             Console.WriteLine("Preparing new game data...");
             Game newGame = new Game();
-            newGame.ThreadTimeStamp = message.ts;
+            newGame.ThreadTimeStamp = gameStartData.ThreadTs;
             newGame.IsActive = true;
+            newGame.StartingUrl = gameStartData.StartingUrl;
+            newGame.EndingUrl = gameStartData.EndingUrl;
 
             // Write changes to database
             Console.WriteLine("Saving data...");
             _context.Games.Add(newGame);
             _context.SaveChanges();
             Console.WriteLine("Game Written and started.");
+        }
+
+        public Game FindGame(NewMessage message)
+        {
+            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
+                                     .FirstOrDefault();
+            return game;
         }
 
         public int FindGameId(NewMessage message)
@@ -143,6 +154,7 @@ namespace WikiGameBot.Data.Loaders
             {
                 player.NumberOfWins++;
                 _context.Players.Update(player);
+                _context.SaveChanges();
             }
         }
 
@@ -153,6 +165,7 @@ namespace WikiGameBot.Data.Loaders
             {
                 player.NumberOfEntries++;
                 _context.Players.Update(player);
+                _context.SaveChanges();
             }
         }
 
@@ -172,6 +185,7 @@ namespace WikiGameBot.Data.Loaders
             var game = _context.Games.Where(x => x.Id == gameId).FirstOrDefault();
             game.IsActive = false;
             _context.Games.Update(game);
+            _context.SaveChanges();
 
             // Prepare Print Message meta-data
             PrintMessage printMessage = new PrintMessage();
@@ -197,6 +211,14 @@ namespace WikiGameBot.Data.Loaders
             }
             return printMessage;
 
+        }
+
+        public Game GetGame(NewMessage message)
+        {
+            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
+                                     .FirstOrDefault();
+            return game;
         }
     }
 }

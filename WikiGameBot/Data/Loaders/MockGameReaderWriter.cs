@@ -5,6 +5,7 @@ using System.Text;
 using SlackAPI.WebSocketMessages;
 using WikiGameBot.Bot;
 using WikiGameBot.Core;
+using WikiGameBot.Data.Entities;
 using WikiGameBot.Data.Loaders.Interfaces;
 
 namespace WikiGameBot.Data.Loaders
@@ -13,6 +14,7 @@ namespace WikiGameBot.Data.Loaders
     {
         public DateTime _mockGameThreadTs { get; set; }
         private List<Entities.GameEntry> gameEntries = new List<Entities.GameEntry>();
+
         public int FindGameId(NewMessage message)
         {
             Console.WriteLine($"Checking Game: ThreadTs={message.thread_ts}");
@@ -24,14 +26,14 @@ namespace WikiGameBot.Data.Loaders
             return -1;
         }
 
-        public void CreateNewGame(NewMessage message)
+        public void CreateNewGame(GameStartData gameStartData)
         {
-            Console.WriteLine($"New Game Create: Ts={message.ts}");
+            Console.WriteLine($"New Game Create: Ts={gameStartData.ThreadTs}");
             gameEntries.Clear();
-            _mockGameThreadTs = message.ts;
+            _mockGameThreadTs = gameStartData.ThreadTs;
         }
 
-        public LoaderResponse AddGameEntry(GameEntry gameEntry)
+        public LoaderResponse AddGameEntry(Core.GameEntry gameEntry)
         {
             Entities.GameEntry newGameEntry = new Entities.GameEntry();
             newGameEntry.GameId = gameEntry.GameId;
@@ -110,6 +112,17 @@ namespace WikiGameBot.Data.Loaders
         public void TestDatabaseConnection()
         {
             //
+        }
+
+        public Game GetGame(NewMessage message)
+        {
+            Console.WriteLine($"Checking Game: ThreadTs={message.thread_ts}");
+            if (message.thread_ts == _mockGameThreadTs)
+            {
+                Console.WriteLine("Game Found");
+                return new Game { Id = 0 };
+            }
+            return null;
         }
     }
 }

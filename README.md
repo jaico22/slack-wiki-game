@@ -30,3 +30,5 @@ e.g:
 5. Reactions to indicate current winner
 
 6. Automated Game Completion
+
+7. Add Proper Logging
