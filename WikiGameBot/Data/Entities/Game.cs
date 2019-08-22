@@ -19,5 +19,15 @@ namespace WikiGameBot.Data.Entities
         /// Indication if game is active
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// URL Players Start At
+        /// </summary>
+        public string StartingUrl { get; set; }
+
+        /// <summary>
+        /// URL Players End At
+        /// </summary>
+        public string EndingUrl { get; set; }
     }
 }
