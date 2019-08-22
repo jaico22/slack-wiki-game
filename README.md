@@ -25,7 +25,7 @@ e.g:
 
 <del>3. Add more in-game feedback</del>
 
-4. Path Confirmation
+<del>4. Path Confirmation</del>
 
 5. Reactions to indicate current winner
 
