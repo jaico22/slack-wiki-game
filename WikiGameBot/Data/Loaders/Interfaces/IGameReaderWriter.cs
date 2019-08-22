@@ -78,6 +78,8 @@ namespace WikiGameBot.Data.Loaders.Interfaces
         /// <returns></returns>
         Entities.GameEntry GetWinningEntry(int gameId);
 
+        void TestDatabaseConnection();
+
         /// <summary>
         /// Returns Game Entity associated with <paramref name="message"/>
         /// </summary>

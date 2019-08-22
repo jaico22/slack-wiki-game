@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace WikiGameBot.Core.PathValidation
 {
@@ -10,15 +11,20 @@ namespace WikiGameBot.Core.PathValidation
 
         public WikiLink FindLink(string linkTitle)
         {
-            WikiLink BestLink = null; 
+            WikiLink BestLink = null;
+            
+            // Check for amiguity
+            var matchingLinkTexts = wikiLinks.Where(x => x.LinkText == linkTitle).ToList();
+            if (matchingLinkTexts.Count() == 1)
+                return matchingLinkTexts[0];
+
+            var matchingPageTitles = wikiLinks.Where(x => x.PageTitle == linkTitle).ToList();
+            if (matchingPageTitles.Count() == 1)
+                return matchingPageTitles[0];
+
+            // If No matches have been found, check if there are any close matches
             foreach(var link in wikiLinks)
             {
-                // Check for exact matches
-                var exactLinkTextMatch = string.Compare(link.LinkText?.ToLower(), linkTitle?.ToLower()) == 0;
-                var exactPageTitleMatch = string.Compare(link.PageTitle?.ToLower(), linkTitle?.ToLower()) == 0;
-                if (exactLinkTextMatch || exactPageTitleMatch)
-                    return link;
-
                 // Attempt to identify typos. Set to a threshold of 10% error in the typing as defined by the Levenshtein
                 // distance (number of corrections needed to get the strings to match) 
                 var maxLevenshteinDistance = (int)Math.Ceiling((decimal)linkTitle.Length * 0.10m);

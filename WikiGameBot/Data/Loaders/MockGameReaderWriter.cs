@@ -109,6 +109,11 @@ namespace WikiGameBot.Data.Loaders
             return printMessage;
         }
 
+        public void TestDatabaseConnection()
+        {
+            //
+        }
+
         public Game GetGame(NewMessage message)
         {
             Console.WriteLine($"Checking Game: ThreadTs={message.thread_ts}");
