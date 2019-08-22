@@ -64,7 +64,7 @@ namespace WikiGameBot.Bot
                     var res = await processor.ProcessMessage(message);
                     if (res != null)
                     {
-                        var chan = _client.Channels.Find(x => x.name.Equals("wiki-game-test-chan"));
+                        var chan = _client.Channels.Find(x => x.name.Equals("wiki-game"));
                         if (res.ThreadTs.HasValue)
                         {
                             var thread_ts = res.ThreadTs.Value.ToProperTimeStamp();
@@ -82,7 +82,7 @@ namespace WikiGameBot.Bot
             clientReady.Wait();
 
             // Send heartbeat
-            var c = _client.Channels.Find(x => x.name.Equals("wiki-game-test-chan"));
+            var c = _client.Channels.Find(x => x.name.Equals("wiki-game"));
             _client.PostMessage(x => Console.WriteLine(x.error), c.id, "Hello! Enter in two wikipedia links to get started!\n" +
                 "Afterwards, reply to that post in the formal \"Starting Page -> Click 1 -> Click 2 -> ... -> Ending Page");
 
