@@ -23,6 +23,32 @@ namespace Tests
             _pathValidator = new PathValidator();
             _pageListExtractor = new PageListExtractor();
         }
+        [Fact]
+        public async Task PagesWithAmbiguousLinksCanBeProcessed_1()
+        {
+            GivenTheGame(new Game { StartingUrl = "https://en.wikipedia.org/wiki/Operation_Goodwood_(naval)",
+                EndingUrl = "https://en.wikipedia.org/wiki/Tamagotchi" });
+            GivenTheInputString("Operation Goodwood (naval) -> Dwight D. Eisenhower -> atomic bomb -> Japan -> State of Japan ->" +
+                " Japanese popular culture -> Japanese pop culture in the United States -> Namco -> Bandai -> Tamagotchi");
+            WhenThePathIsGenerated();
+            await AndThePathIsValidated();
+            ThenThePathIsValid();
+        }
+
+        [Fact]
+        public async Task PagesWithAmbiguousLinksCanBeProcessed_2()
+        {
+            GivenTheGame(new Game
+            {
+                StartingUrl = "https://en.wikipedia.org/wiki/Operation_Goodwood_(naval)",
+                EndingUrl = "https://en.wikipedia.org/wiki/Tamagotchi"
+            });
+            GivenTheInputString("Operation Goodwood (naval) -> Dwight D. Eisenhower -> atomic bomb -> Japan -> Japan ->" +
+                " Japanese popular culture -> Japanese pop culture in the United States -> Namco -> Bandai -> Tamagotchi");
+            WhenThePathIsGenerated();
+            await AndThePathIsValidated();
+            ThenThePathIsValid();
+        }
 
         [Fact]
         public async Task InvalidPathCanBeDetected()
