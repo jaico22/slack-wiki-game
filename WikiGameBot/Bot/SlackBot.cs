@@ -16,6 +16,7 @@ namespace WikiGameBot.Bot
     {
         public SlackSocketClient _client { get; set; }
 
+        private GameAutomation _gameAutomation; 
         private IDBServerInfoLoader _dBServerInfoLoader;
         private IGameReaderWriter _gameReaderWriter;
         private readonly LeaderBoardGenerator _leaderBoardGenerator;
@@ -26,6 +27,7 @@ namespace WikiGameBot.Bot
             _gameReaderWriter = gameReaderWriter;
             _dBServerInfoLoader = dBServerInfoLoader;
             _leaderBoardGenerator = new LeaderBoardGenerator(_gameReaderWriter);
+            _gameAutomation = new GameAutomation();
         }
 
         public async Task Connect()
@@ -92,7 +94,9 @@ namespace WikiGameBot.Bot
                 _client.PostMessage(x => Console.WriteLine(x.error), c.id, $"{leaderboardString}\nType \"wiki-bot: leaderboard\" to bring back the leader board at any time.");
             }
 
-            while (true) { };
+            while (true) {
+                await _gameAutomation.RunAutomatedTasksAsync();
+            };
         }
     }
 }

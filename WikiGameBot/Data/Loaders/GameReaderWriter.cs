@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SlackAPI.WebSocketMessages;
 using WikiGameBot.Bot;
 using WikiGameBot.Core;
@@ -229,6 +231,11 @@ namespace WikiGameBot.Data.Loaders
         public List<Game> GetActiveGames()
         {
             return _context.Games.Where(x => x.IsActive == true).ToList();
+        }
+        public async Task<List<Game>> GetActiveGamesAsync()
+        {
+            var games = await _context.Games.Where(x => x.IsActive == true).ToListAsync();
+            return games; 
         }
 
     }
