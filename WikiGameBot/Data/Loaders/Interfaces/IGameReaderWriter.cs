@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using WikiGameBot.Bot;
 using WikiGameBot.Core;
 using WikiGameBot.Data.Entities;
@@ -10,6 +11,8 @@ namespace WikiGameBot.Data.Loaders.Interfaces
 {
     public interface IGameReaderWriter
     {
+        Task<List<Game>> GetActiveGamesAsync();
+
         /// <summary>
         /// Retruns a list of active games
         /// </summary>

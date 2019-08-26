@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using SlackAPI.WebSocketMessages;
 using WikiGameBot.Bot;
 using WikiGameBot.Core;
@@ -135,5 +136,9 @@ namespace WikiGameBot.Data.Loaders
             return null;
         }
 
+        public Task<List<Game>> GetActiveGamesAsync()
+        {
+            return null;
+        }
     }
 }

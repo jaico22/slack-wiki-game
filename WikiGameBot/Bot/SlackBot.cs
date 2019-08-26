@@ -27,7 +27,7 @@ namespace WikiGameBot.Bot
             _gameReaderWriter = gameReaderWriter;
             _dBServerInfoLoader = dBServerInfoLoader;
             _leaderBoardGenerator = new LeaderBoardGenerator(_gameReaderWriter);
-            _gameAutomation = new GameAutomation();
+            _gameAutomation = new GameAutomation(_gameReaderWriter);
         }
 
         public async Task Connect()
@@ -95,7 +95,15 @@ namespace WikiGameBot.Bot
             }
 
             while (true) {
-                await _gameAutomation.RunAutomatedTasksAsync();
+                try
+                {
+                    await _gameAutomation.RunAutomatedTasksAsync();
+
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             };
         }
     }

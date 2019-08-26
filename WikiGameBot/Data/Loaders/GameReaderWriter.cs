@@ -15,6 +15,7 @@ namespace WikiGameBot.Data.Loaders
     public class GameReaderWriter : IGameReaderWriter
     {
         private readonly WikiBotDataDbContext _context;
+        private readonly object gameLock = new Object();
 
         public GameReaderWriter(WikiBotDataDbContext context)
         {
@@ -99,25 +100,31 @@ namespace WikiGameBot.Data.Loaders
 
         public Game FindGame(NewMessage message)
         {
-            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
-            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
-                                     .FirstOrDefault();
-            return game;
+            lock (gameLock)
+            {
+                Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+                var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
+                                         .FirstOrDefault();
+                return game;
+            }
         }
 
         public int FindGameId(NewMessage message)
         {
-            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
-            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive==true)
-                                     .FirstOrDefault();
-            if (game != null)
+            lock (gameLock)
             {
-                return game.Id;
-            }
-            else
-            {
-                Console.WriteLine($"Game does not exist; A value of -1 will be returned.");
-                return -1;
+                Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+                var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
+                                         .FirstOrDefault();
+                if (game != null)
+                {
+                    return game.Id;
+                }
+                else
+                {
+                    Console.WriteLine($"Game does not exist; A value of -1 will be returned.");
+                    return -1;
+                }
             }
         }
 
@@ -183,44 +190,49 @@ namespace WikiGameBot.Data.Loaders
 
         public PrintMessage EndGame(int gameId)
         {
-            // Set Game to inactive
-            var game = _context.Games.Where(x => x.Id == gameId).FirstOrDefault();
-            game.IsActive = false;
-            _context.Games.Update(game);
-            _context.SaveChanges();
-
-            // Prepare Print Message meta-data
-            PrintMessage printMessage = new PrintMessage();
-            printMessage.ThreadTs = game.ThreadTimeStamp;
-            printMessage.IsReply = true;
-
-            // Find winner and players that played
-            var winningEntry = GetWinningEntry(gameId);
-            if (winningEntry != null)
+            lock (gameLock)
             {
-                var playerIds = _context.GameEntries.Where(x => x.GameId == gameId).Select(x => x.UserId).ToList();
-                foreach (var playerId in playerIds)
+                // Set Game to inactive
+                var game = _context.Games.Where(x => x.Id == gameId).FirstOrDefault();
+                game.IsActive = false;
+                _context.Games.Update(game);
+                _context.SaveChanges();
+
+                // Prepare Print Message meta-data
+                PrintMessage printMessage = new PrintMessage();
+                printMessage.ThreadTs = game.ThreadTimeStamp;
+                printMessage.IsReply = true;
+
+                // Find winner and players that played
+                var winningEntry = GetWinningEntry(gameId);
+                if (winningEntry != null)
                 {
-                    IncrementPlayerEntryCount(playerId);
+                    var playerIds = _context.GameEntries.Where(x => x.GameId == gameId).Select(x => x.UserId).ToList();
+                    foreach (var playerId in playerIds)
+                    {
+                        IncrementPlayerEntryCount(playerId);
+                    }
+                    IncrementPlayerWinCount(winningEntry.UserId);
+                    // Return Winning String
+                    printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with {winningEntry.LinkCount} click long entry of \"{winningEntry.RawText}\"";
                 }
-                IncrementPlayerWinCount(winningEntry.UserId);
-                // Return Winning String
-                printMessage.MessageText = $"Game ended! {winningEntry.UserName} wins with {winningEntry.LinkCount} click long entry of \"{winningEntry.RawText}\"";
+                else
+                {
+                    printMessage.MessageText = "Game Canceled";
+                }
+                return printMessage;
             }
-            else
-            {
-                printMessage.MessageText = "Game Canceled";
-            }
-            return printMessage;
-
         }
 
         public Game GetGame(NewMessage message)
         {
-            Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
-            var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
-                                     .FirstOrDefault();
-            return game;
+            lock (gameLock)
+            {
+                Console.WriteLine($"Checking if an active game exists on current thread (thread_ts={message.thread_ts})");
+                var game = _context.Games.Where(x => x.ThreadTimeStamp == message.thread_ts && x.IsActive == true)
+                                         .FirstOrDefault();
+                return game;
+            }
         }
 
         public List<Player> GetLeaderBoard(int limit)
@@ -234,8 +246,11 @@ namespace WikiGameBot.Data.Loaders
         }
         public async Task<List<Game>> GetActiveGamesAsync()
         {
-            var games = await _context.Games.Where(x => x.IsActive == true).ToListAsync();
-            return games; 
+            lock (gameLock)
+            {
+                var games = _context.Games.Where(x => x.IsActive == true).ToList();
+                return games;
+            }
         }
 
     }
