@@ -226,12 +226,5 @@ namespace WikiGameBot.Data.Loaders
             return _context.Players.OrderByDescending(x => x.NumberOfWins).ThenBy(x=>x.NumberOfEntries).Take(limit).ToList();
         }
 
-        void IGameReaderWriter.EndGame(int gameId)
-        {
-            var game = _context.Games.Where(x => x.Id == gameId).FirstOrDefault();
-            game.IsActive = false;
-            _context.Update(game);
-            _context.SaveChanges();
-        }
     }
 }

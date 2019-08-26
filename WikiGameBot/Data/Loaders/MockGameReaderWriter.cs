@@ -130,9 +130,5 @@ namespace WikiGameBot.Data.Loaders
             return null;
         }
 
-        void IGameReaderWriter.EndGame(int gameId)
-        {
-            //
-        }
     }
 }
