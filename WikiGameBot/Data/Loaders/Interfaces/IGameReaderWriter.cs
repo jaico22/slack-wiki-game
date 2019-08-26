@@ -11,6 +11,12 @@ namespace WikiGameBot.Data.Loaders.Interfaces
     public interface IGameReaderWriter
     {
         /// <summary>
+        /// Ends game identified by <paramref name="gameId"/>
+        /// </summary>
+        /// <param name="gameId"></param>
+        void EndGame(int gameId);
+
+        /// <summary>
         /// Returns ID related to thread with existing timestamp
         /// </summary>
         /// <param name="message"></param>
