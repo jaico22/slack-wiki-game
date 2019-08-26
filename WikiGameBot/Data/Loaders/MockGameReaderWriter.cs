@@ -130,5 +130,10 @@ namespace WikiGameBot.Data.Loaders
             return null;
         }
 
+        public List<Game> GetActiveGames()
+        {
+            return null;
+        }
+
     }
 }

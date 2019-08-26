@@ -11,6 +11,12 @@ namespace WikiGameBot.Data.Loaders.Interfaces
     public interface IGameReaderWriter
     {
         /// <summary>
+        /// Retruns a list of active games
+        /// </summary>
+        /// <returns></returns>
+        List<Game> GetActiveGames();
+
+        /// <summary>
         /// Returns ID related to thread with existing timestamp
         /// </summary>
         /// <param name="message"></param>

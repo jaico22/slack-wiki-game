@@ -226,5 +226,10 @@ namespace WikiGameBot.Data.Loaders
             return _context.Players.OrderByDescending(x => x.NumberOfWins).ThenBy(x=>x.NumberOfEntries).Take(limit).ToList();
         }
 
+        public List<Game> GetActiveGames()
+        {
+            return _context.Games.Where(x => x.IsActive == true).ToList();
+        }
+
     }
 }
